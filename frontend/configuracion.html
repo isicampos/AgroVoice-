@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Configuración | AgroVoice</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f4;
+            color: #26382c;
+        }
+
+        .config-page {
+            min-height: 100vh;
+            padding: 35px 50px;
+        }
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            color: #145c28;
+            font-size: 34px;
+        }
+
+        .encabezado p {
+            color: #718078;
+        }
+
+        .btn-volver {
+            background: #145c28;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .config-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #e5ece6;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+        }
+
+        .config-card h2 {
+            color: #145c28;
+            margin-top: 0;
+        }
+
+        .config-card p {
+            color: #718078;
+            line-height: 1.6;
+        }
+
+        .dato {
+            background: #f5faf5;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 12px;
+        }
+
+        .dato strong {
+            color: #145c28;
+        }
+
+        .btn-accion {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #1b6d2b;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-salir {
+            background: #c62828;
+        }
+
+        @media(max-width:800px) {
+
+            .config-page {
+                padding: 25px 18px;
+            }
+
+            .encabezado {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<main class="config-page">
+
+
+    <div class="encabezado">
+
+        <div>
+
+            <h1>⚙️ Configuración</h1>
+
+            <p>
+                Administra tu cuenta y las preferencias de AgroVoice.
+            </p>
+
+        </div>
+
+
+        <a
+            href="/dashboard"
+            class="btn-volver"
+        >
+            ← Volver al Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="config-grid">
+
+
+        <!-- CUENTA -->
+
+        <section class="config-card">
+
+            <h2>👤 Mi cuenta</h2>
+
+            <p>
+                Información de la cuenta actualmente conectada.
+            </p>
+
+            <div class="dato">
+
+                <strong>Usuario:</strong>
+
+                <span id="usuarioActual">
+                    Cargando...
+                </span>
+
+            </div>
+
+            <button
+                class="btn-accion btn-salir"
+                onclick="cerrarSesion()"
+            >
+                Cerrar sesión
+            </button>
+
+        </section>
+
+
+        <!-- AGROVOICE -->
+
+        <section class="config-card">
+
+            <h2>🌱 AgroVoice</h2>
+
+            <p>
+                Sistema Inteligente de Registro Agrícola.
+            </p>
+
+            <div class="dato">
+
+                <strong>Versión:</strong>
+                1.0.0
+
+            </div>
+
+            <div class="dato">
+
+                <strong>Estado:</strong>
+                Sistema activo
+
+            </div>
+
+            <div class="dato">
+
+                <strong>Año:</strong>
+                2026
+
+            </div>
+
+        </section>
+
+
+        <!-- FUTURAS FUNCIONES -->
+
+        <section class="config-card">
+
+            <h2>🔔 Notificaciones</h2>
+
+            <p>
+                Próximamente podrás configurar alertas
+                agrícolas, recordatorios de labores y
+                avisos importantes.
+            </p>
+
+        </section>
+
+
+        <section class="config-card">
+
+            <h2>📱 Aplicación móvil</h2>
+
+            <p>
+                AgroVoice contará con una aplicación móvil
+                para registrar información agrícola mediante
+                voz, incluso cuando no exista conexión.
+            </p>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<script>
+
+    async function cargarUsuario() {
+
+        try {
+
+            const respuesta =
+                await fetch("/usuario_actual");
+
+            const datos =
+                await respuesta.json();
+
+            document.getElementById(
+                "usuarioActual"
+            ).textContent =
+                datos.usuario || "No identificado";
+
+        } catch (error) {
+
+            document.getElementById(
+                "usuarioActual"
+            ).textContent =
+                "No disponible";
+
+        }
+
+    }
+
+
+    function cerrarSesion() {
+
+        window.location.href = "/logout";
+
+    }
+
+
+    cargarUsuario();
+
+</script>
+
+
+</body>
+
+</html>

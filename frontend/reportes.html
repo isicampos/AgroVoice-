@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Reportes | AgroVoice</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f4;
+            color: #26382c;
+        }
+
+        .reportes-page {
+            min-height: 100vh;
+            padding: 35px 50px;
+        }
+
+        /* ENCABEZADO */
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            color: #145c28;
+            font-size: 34px;
+        }
+
+        .encabezado p {
+            color: #718078;
+            margin-top: 8px;
+        }
+
+        .btn-volver {
+            background: #145c28;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: .2s;
+        }
+
+        .btn-volver:hover {
+            background: #0d451e;
+        }
+
+        /* TARJETAS */
+
+        .reportes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .reporte-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #e5ece6;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            transition: .2s;
+        }
+
+        .reporte-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,.10);
+        }
+
+        .reporte-icono {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .reporte-card h2 {
+            color: #145c28;
+            margin-bottom: 10px;
+        }
+
+        .reporte-card p {
+            color: #718078;
+            line-height: 1.5;
+            font-size: 14px;
+            min-height: 65px;
+        }
+
+        .btn-reporte {
+            margin-top: 15px;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #1b6d2b;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .btn-reporte:hover {
+            background: #14551f;
+            transform: translateY(-1px);
+        }
+
+        .btn-pdf {
+            background: #8b2d2d;
+        }
+
+        .btn-pdf:hover {
+            background: #6f2020;
+        }
+
+        /* RESULTADO */
+
+        .resultado-card {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #e5ece6;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            margin-bottom: 30px;
+        }
+
+        .resultado-card.visible {
+            display: block;
+        }
+
+        .resultado-card h2 {
+            color: #145c28;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* ESTADÍSTICAS */
+
+        .estadisticas {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .estadistica {
+            background: #f5faf5;
+            border-radius: 14px;
+            padding: 22px;
+            text-align: center;
+            border: 1px solid #e0ebe1;
+        }
+
+        .estadistica .numero {
+            display: block;
+            font-size: 32px;
+            font-weight: bold;
+            color: #145c28;
+            margin-bottom: 6px;
+        }
+
+        .estadistica .nombre {
+            color: #718078;
+            font-size: 13px;
+        }
+
+        /* TABLA */
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: #145c28;
+            color: white;
+            padding: 14px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e8eee9;
+            color: #536158;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: #f5faf5;
+        }
+
+        /* MENSAJES */
+
+        .mensaje-reporte {
+            padding: 18px;
+            border-radius: 12px;
+            background: #f5faf5;
+            color: #536158;
+        }
+
+        .mensaje-error {
+            background: #fff3f3;
+            color: #b3261e;
+            border: 1px solid #f0cccc;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 1000px) {
+
+            .reportes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .estadisticas {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 700px) {
+
+            .reportes-page {
+                padding: 25px 18px;
+            }
+
+            .encabezado {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .estadisticas {
+                grid-template-columns: 1fr;
+            }
+
+            .encabezado h1 {
+                font-size: 28px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<main class="reportes-page">
+
+
+    <!-- ENCABEZADO -->
+
+    <div class="encabezado">
+
+        <div>
+
+            <h1>📊 Reportes</h1>
+
+            <p>
+                Consulta y analiza la información
+                de tu gestión agrícola.
+            </p>
+
+        </div>
+
+        <a
+            href="/dashboard"
+            class="btn-volver"
+        >
+            ← Volver al Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- TARJETAS -->
+
+    <div class="reportes-grid">
+
+
+        <!-- REPORTE GENERAL -->
+
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                📋
+            </div>
+
+            <h2>
+                Reporte general
+            </h2>
+
+            <p>
+                Visualiza un resumen de productores,
+                predios, cuarteles y registros agrícolas.
+            </p>
+
+            <button
+                class="btn-reporte"
+                onclick="generarReporteGeneral()"
+            >
+                Generar reporte
+            </button>
+
+        </div>
+
+
+        <!-- LABORES -->
+
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                🚜
+            </div>
+
+            <h2>
+                Labores agrícolas
+            </h2>
+
+            <p>
+                Consulta los registros y labores
+                ingresadas en AgroVoice.
+            </p>
+
+            <button
+                class="btn-reporte"
+                onclick="generarReporteLabores()"
+            >
+                Ver registros
+            </button>
+
+        </div>
+
+
+        <!-- EXPORTAR -->
+
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                📥
+            </div>
+
+            <h2>
+                Exportar datos
+            </h2>
+
+            <p>
+                Descarga tu información agrícola
+                en formatos profesionales.
+            </p>
+
+            <button
+                class="btn-reporte"
+                onclick="exportarExcel()"
+            >
+                📊 Descargar Excel
+            </button>
+
+            <button
+                class="btn-reporte btn-pdf"
+                onclick="exportarPDF()"
+            >
+                📄 Descargar PDF
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- RESULTADO -->
+
+    <section
+        id="resultadoReporte"
+        class="resultado-card"
+    >
+
+        <h2 id="tituloResultado">
+            Resultado
+        </h2>
+
+        <div id="contenidoResultado"></div>
+
+    </section>
+
+
+</main>
+
+
+<script>
+
+
+/* =========================================
+   REPORTE GENERAL
+========================================= */
+
+async function generarReporteGeneral() {
+
+    const resultado =
+        document.getElementById(
+            "resultadoReporte"
+        );
+
+    const titulo =
+        document.getElementById(
+            "tituloResultado"
+        );
+
+    const contenido =
+        document.getElementById(
+            "contenidoResultado"
+        );
+
+
+    resultado.classList.add("visible");
+
+    titulo.textContent =
+        "📊 Resumen general de AgroVoice";
+
+    contenido.innerHTML = `
+        <div class="mensaje-reporte">
+            Cargando información...
+        </div>
+    `;
+
+
+    try {
+
+        const respuesta =
+            await fetch("/dashboard_api");
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "Error al cargar el reporte."
+            );
+
+        }
+
+
+        const datos =
+            await respuesta.json();
+
+
+        contenido.innerHTML = `
+
+            <div class="estadisticas">
+
+                <div class="estadistica">
+
+                    <span class="numero">
+                        ${datos.productores ?? 0}
+                    </span>
+
+                    <span class="nombre">
+                        Productores
+                    </span>
+
+                </div>
+
+
+                <div class="estadistica">
+
+                    <span class="numero">
+                        ${datos.predios ?? 0}
+                    </span>
+
+                    <span class="nombre">
+                        Predios
+                    </span>
+
+                </div>
+
+
+                <div class="estadistica">
+
+                    <span class="numero">
+                        ${datos.cuarteles ?? 0}
+                    </span>
+
+                    <span class="nombre">
+                        Cuarteles
+                    </span>
+
+                </div>
+
+
+                <div class="estadistica">
+
+                    <span class="numero">
+                        ${datos.registros ?? 0}
+                    </span>
+
+                    <span class="nombre">
+                        Registros
+                    </span>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        contenido.innerHTML = `
+
+            <div class="mensaje-reporte mensaje-error">
+
+                ❌ No fue posible cargar el reporte.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   LABORES AGRÍCOLAS
+========================================= */
+
+async function generarReporteLabores() {
+
+    const resultado =
+        document.getElementById(
+            "resultadoReporte"
+        );
+
+    const titulo =
+        document.getElementById(
+            "tituloResultado"
+        );
+
+    const contenido =
+        document.getElementById(
+            "contenidoResultado"
+        );
+
+
+    resultado.classList.add("visible");
+
+    titulo.textContent =
+        "🚜 Registros y labores agrícolas";
+
+
+    contenido.innerHTML = `
+        <div class="mensaje-reporte">
+            Cargando registros...
+        </div>
+    `;
+
+
+    try {
+
+        const respuesta =
+            await fetch("/registros");
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "No se pudieron obtener los registros."
+            );
+
+        }
+
+
+        const registros =
+            await respuesta.json();
+
+
+        if (!registros.length) {
+
+            contenido.innerHTML = `
+
+                <div class="mensaje-reporte">
+
+                    🌱 Todavía no existen registros agrícolas.
+
+                    <br><br>
+
+                    Cuando ingreses labores,
+                    aparecerán aquí.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        let filas = "";
+
+
+        registros.forEach(registro => {
+
+            filas += `
+
+                <tr>
+
+                    <td>
+                        ${registro.fecha ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.productor ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.predio ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.cuartel ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.cultivo ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.labor ?? ""}
+                    </td>
+
+                    <td>
+                        ${registro.transcripcion ?? ""}
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+        contenido.innerHTML = `
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Fecha</th>
+                            <th>Productor</th>
+                            <th>Predio</th>
+                            <th>Cuartel</th>
+                            <th>Cultivo</th>
+                            <th>Labor</th>
+                            <th>Descripción</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${filas}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        contenido.innerHTML = `
+
+            <div class="mensaje-reporte mensaje-error">
+
+                ❌ No fue posible cargar los registros.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================
+   EXCEL
+========================================= */
+
+function exportarExcel() {
+
+    window.location.href =
+        "/exportar_excel";
+
+}
+
+
+/* =========================================
+   PDF
+========================================= */
+
+function exportarPDF() {
+
+    window.location.href =
+        "/exportar_pdf";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

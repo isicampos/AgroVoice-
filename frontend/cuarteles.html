@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cuarteles | AgroVoice</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f4;
+            color: #26382c;
+        }
+
+        .cuarteles-page {
+            min-height: 100vh;
+            padding: 35px 50px;
+        }
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            color: #145c28;
+            font-size: 34px;
+        }
+
+        .encabezado p {
+            color: #718078;
+        }
+
+        .btn-volver {
+            background: #145c28;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .contenedor {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            border: 1px solid #e5ece6;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #145c28;
+        }
+
+        .subtitulo {
+            color: #78857d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .campo {
+            margin-bottom: 17px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select {
+            width: 100%;
+            height: 45px;
+            box-sizing: border-box;
+            padding: 0 12px;
+            border: 1px solid #d4ded6;
+            border-radius: 10px;
+            background: #fbfdfb;
+            font-size: 14px;
+        }
+
+        .btn-guardar {
+            width: 100%;
+            height: 47px;
+            border: none;
+            border-radius: 10px;
+            background: #1b6d2b;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-guardar:hover {
+            background: #14551f;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #145c28;
+            color: white;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #edf1ed;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f5faf5;
+        }
+
+        .btn-eliminar {
+            background: #fdecec;
+            color: #c62828;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .sin-datos {
+            text-align: center;
+            padding: 35px;
+            color: #87938b;
+        }
+
+        #mensaje {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .cuarteles-page {
+                padding: 25px 18px;
+            }
+
+            .encabezado {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .contenedor {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="cuarteles-page">
+
+    <div class="encabezado">
+
+        <div>
+            <h1>🌱 Cuarteles</h1>
+
+            <p>
+                Organiza los sectores productivos de cada predio.
+            </p>
+        </div>
+
+        <a href="/dashboard" class="btn-volver">
+            ← Volver al Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="contenedor">
+
+        <!-- FORMULARIO -->
+
+        <section class="card">
+
+            <h2>📍 Nuevo cuartel</h2>
+
+            <p class="subtitulo">
+                Registra un nuevo sector productivo.
+            </p>
+
+
+            <div class="campo">
+
+                <label for="nombre">
+                    Nombre del cuartel
+                </label>
+
+                <input
+                    id="nombre"
+                    type="text"
+                    placeholder="Ej: Cuartel Norte"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="predio">
+                    Predio
+                </label>
+
+                <select id="predio">
+
+                    <option value="">
+                        Seleccionar predio
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="cultivo">
+                    Cultivo
+                </label>
+
+                <select id="cultivo">
+
+                    <option value="">
+                        Seleccionar cultivo
+                    </option>
+
+                    <option value="Vid">
+                        Vid
+                    </option>
+
+                    <option value="Cítricos">
+                        Cítricos
+                    </option>
+
+                    <option value="Palto">
+                        Palto
+                    </option>
+
+                    <option value="Nogal">
+                        Nogal
+                    </option>
+
+                    <option value="Cerezo">
+                        Cerezo
+                    </option>
+
+                    <option value="Hortalizas">
+                        Hortalizas
+                    </option>
+
+                    <option value="Otro">
+                        Otro
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="variedad">
+                    Variedad
+                </label>
+
+                <input
+                    id="variedad"
+                    type="text"
+                    placeholder="Ej: Thompson Seedless"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="superficie">
+                    Superficie (ha)
+                </label>
+
+                <input
+                    id="superficie"
+                    type="number"
+                    step="0.01"
+                    placeholder="Ej: 2.5"
+                >
+
+            </div>
+
+
+            <button
+                class="btn-guardar"
+                onclick="guardarCuartel()"
+            >
+                + Guardar cuartel
+            </button>
+
+            <div id="mensaje"></div>
+
+        </section>
+
+
+        <!-- TABLA -->
+
+        <section class="card">
+
+            <h2>📋 Cuarteles registrados</h2>
+
+            <p class="subtitulo">
+                Consulta los sectores productivos registrados.
+            </p>
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Cuartel</th>
+                            <th>Predio</th>
+                            <th>Cultivo</th>
+                            <th>Variedad</th>
+                            <th>Superficie</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tablaCuarteles">
+
+                        <tr>
+                            <td colspan="7" class="sin-datos">
+                                Cargando cuarteles...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script src="/static/js/cuarteles.js"></script>
+
+</body>
+</html>

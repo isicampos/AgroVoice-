@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Productores</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<button onclick="location.href='/dashboard'">
+
+← Volver al Dashboard
+
+</button>
+
+<br><br>
+
+<div class="contenedor">
+
+<h1>Productores</h1>
+
+...
+
+<div class="contenedor">
+
+<h1>👨‍🌾 Productores</h1>
+
+<input id="nombre" class="caja" placeholder="Nombre">
+
+<br><br>
+
+<input id="predio" class="caja" placeholder="Predio">
+
+<br><br>
+
+<input id="cultivo" class="caja" placeholder="Cultivo">
+
+<br><br>
+
+<button onclick="guardarProductor()">
+
+Guardar Productor
+
+</button>
+
+<br><br>
+
+<table id="tabla">
+
+<tr>
+
+<th>ID</th>
+
+<th>Nombre</th>
+
+<th>Predio</th>
+
+<th>Cultivo</th>
+
+</tr>
+
+</table>
+
+<br>
+
+<button onclick="location.href='/dashboard'">
+
+⬅ Volver
+
+</button>
+
+</div>
+
+<script>
+
+window.onload = cargar;
+
+function cargar() {
+
+    fetch("http://127.0.0.1:8000/productores")
+
+    .then(response => response.json())
+
+    .then(datos => {
+
+        let tabla = document.getElementById("tabla");
+
+        tabla.innerHTML = `
+
+        <tr>
+
+        <th>ID</th>
+
+        <th>Nombre</th>
+
+        <th>Predio</th>
+
+        <th>Cultivo</th>
+
+        </tr>
+
+        `;
+
+        datos.forEach(p => {
+
+            tabla.innerHTML += `
+
+            <tr>
+
+                <td>${p.id}</td>
+
+                <td>${p.nombre}</td>
+
+                <td>${p.predio}</td>
+
+                <td>${p.cultivo}</td>
+
+                <td>
+                    <button onclick="editar(${p.id}, '${p.nombre}', '${p.predio}', '${p.cultivo}')">
+                        Editar
+                    </button>
+                    <button onclick="eliminar(${p.id})">
+                        Eliminar
+                    </button>
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+    });
+
+}
+
+async function guardarProductor() {
+
+    const datos = {
+
+        nombre: document.getElementById("nombre").value,
+
+        predio: document.getElementById("predio").value,
+
+        cultivo: document.getElementById("cultivo").value
+
+    };
+
+    try {
+
+        const respuesta = await fetch("http://127.0.0.1:8000/productores", {
+
+            method: "POST",
+
+            headers: {
+
+                "Content-Type": "application/json"
+
+            },
+
+            body: JSON.stringify(datos)
+
+        });
+
+        if (!respuesta.ok) {
+
+            throw new Error("No se pudo guardar");
+
+        }
+
+        await respuesta.json();
+
+        document.getElementById("nombre").value = "";
+
+        document.getElementById("predio").value = "";
+
+        document.getElementById("cultivo").value = "";
+
+        cargar();
+
+        alert("✅ Productor guardado correctamente");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        alert(error);
+
+    }
+
+}
+
+async function eliminar(id){
+
+    if(!confirm("¿Eliminar productor?")) return;
+
+    await fetch("/productores/"+id,{
+
+        method:"DELETE"
+
+    });
+
+    cargar();
+
+}
+async function editar(id,nombre,predio,cultivo){
+
+    const nuevoNombre = prompt("Nombre",nombre);
+
+    if(nuevoNombre==null) return;
+
+    const nuevoPredio = prompt("Predio",predio);
+
+    if(nuevoPredio==null) return;
+
+    const nuevoCultivo = prompt("Cultivo",cultivo);
+
+    if(nuevoCultivo==null) return;
+
+    await fetch("/productores/"+id,{
+
+        method:"PUT",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify({
+
+            nombre:nuevoNombre,
+
+            predio:nuevoPredio,
+
+            cultivo:nuevoCultivo
+
+        })
+
+    });
+
+    cargar();
+
+}
+</script>
+
+</body>
+
+</html>

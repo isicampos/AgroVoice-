@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registros | AgroVoice</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7f4;
+            color: #26382c;
+        }
+
+        .registros-page {
+            min-height: 100vh;
+            padding: 35px 50px;
+        }
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            color: #145c28;
+            font-size: 34px;
+        }
+
+        .encabezado p {
+            color: #718078;
+        }
+
+        .btn-volver {
+            background: #145c28;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .contenedor {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            border: 1px solid #e5ece6;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #145c28;
+        }
+
+        .subtitulo {
+            color: #78857d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .campo {
+            margin-bottom: 17px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #34483b;
+        }
+
+        .campo input,
+        .campo select,
+        .campo textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #d4ded6;
+            border-radius: 10px;
+            background: #fbfdfb;
+            font-size: 14px;
+            padding: 12px;
+            outline: none;
+        }
+
+        .campo input,
+        .campo select {
+            height: 45px;
+        }
+
+        .campo textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .campo input:focus,
+        .campo select:focus,
+        .campo textarea:focus {
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46,125,50,.10);
+        }
+
+        .btn-guardar {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 10px;
+            background: #1b6d2b;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-guardar:hover {
+            background: #14551f;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #145c28;
+            color: white;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #edf1ed;
+            font-size: 13px;
+        }
+
+        tr:hover td {
+            background: #f5faf5;
+        }
+
+        .btn-eliminar {
+            background: #fdecec;
+            color: #c62828;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .sin-datos {
+            text-align: center;
+            padding: 35px;
+            color: #87938b;
+        }
+
+        #mensaje {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .audio-info {
+            background: #eef7ef;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            color: #38623f;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1000px) {
+
+            .registros-page {
+                padding: 25px 18px;
+            }
+
+            .encabezado {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .contenedor {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<main class="registros-page">
+
+
+    <!-- =================================
+         ENCABEZADO
+    ================================== -->
+
+    <div class="encabezado">
+
+        <div>
+
+            <h1>📝 Registros agrícolas</h1>
+
+            <p>
+                Registra y consulta las labores realizadas
+                en tus predios.
+            </p>
+
+        </div>
+
+
+        <a
+            href="/dashboard"
+            class="btn-volver"
+        >
+            ← Volver al Dashboard
+        </a>
+
+    </div>
+
+
+
+    <div class="contenedor">
+
+
+        <!-- =================================
+             NUEVO REGISTRO
+        ================================== -->
+
+        <section class="card">
+
+            <h2>➕ Nuevo registro</h2>
+
+            <p class="subtitulo">
+
+                Ingresa la información de la labor agrícola.
+
+            </p>
+
+
+            <div class="campo">
+
+                <label for="fecha">
+                    Fecha
+                </label>
+
+                <input
+                    id="fecha"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="productor">
+                    Productor / Empresa
+                </label>
+
+                <select id="productor">
+
+                    <option value="">
+                        Seleccionar productor
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="predio">
+                    Predio
+                </label>
+
+                <select id="predio">
+
+                    <option value="">
+                        Seleccionar predio
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="cuartel">
+                    Cuartel
+                </label>
+
+                <select id="cuartel">
+
+                    <option value="">
+                        Seleccionar cuartel
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="cultivo">
+                    Cultivo
+                </label>
+
+                <select id="cultivo">
+
+                    <option value="">
+                        Seleccionar cultivo
+                    </option>
+
+                    <option value="Vid">
+                        Vid
+                    </option>
+
+                    <option value="Cítricos">
+                        Cítricos
+                    </option>
+
+                    <option value="Palto">
+                        Palto
+                    </option>
+
+                    <option value="Nogal">
+                        Nogal
+                    </option>
+
+                    <option value="Cerezo">
+                        Cerezo
+                    </option>
+
+                    <option value="Hortalizas">
+                        Hortalizas
+                    </option>
+
+                    <option value="Otro">
+                        Otro
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="labor">
+                    Labor agrícola
+                </label>
+
+                <select id="labor">
+
+                    <option value="">
+                        Seleccionar labor
+                    </option>
+
+                    <option value="Riego">
+                        💧 Riego
+                    </option>
+
+                    <option value="Fertilización">
+                        🌱 Fertilización
+                    </option>
+
+                    <option value="Aplicación fitosanitaria">
+                        🧪 Aplicación fitosanitaria
+                    </option>
+
+                    <option value="Poda">
+                        ✂️ Poda
+                    </option>
+
+                    <option value="Cosecha">
+                        🍇 Cosecha
+                    </option>
+
+                    <option value="Monitoreo">
+                        🔎 Monitoreo
+                    </option>
+
+                    <option value="Otro">
+                        📋 Otro
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="audio-info">
+
+                🎙️ Próximamente podrás registrar esta
+                información directamente mediante un audio
+                de voz con AgroVoice.
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="transcripcion">
+                    Descripción / transcripción
+                </label>
+
+                <textarea
+                    id="transcripcion"
+                    placeholder="Ej: Se realizó riego durante 4 horas en el cuartel 3."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                class="btn-guardar"
+                onclick="guardarRegistro()"
+            >
+
+                💾 Guardar registro
+
+            </button>
+
+
+            <div id="mensaje"></div>
+
+        </section>
+
+
+
+        <!-- =================================
+             TABLA
+        ================================== -->
+
+        <section class="card">
+
+            <h2>📋 Últimos registros</h2>
+
+            <p class="subtitulo">
+
+                Historial de labores registradas
+                en AgroVoice.
+
+            </p>
+
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Fecha</th>
+
+                            <th>Productor</th>
+
+                            <th>Predio</th>
+
+                            <th>Cuartel</th>
+
+                            <th>Cultivo</th>
+
+                            <th>Labor</th>
+
+                            <th>Descripción</th>
+
+                            <th>Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tablaRegistros">
+
+                        <tr>
+
+                            <td
+                                colspan="9"
+                                class="sin-datos"
+                            >
+
+                                Cargando registros...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<script src="/static/js/registros.js"></script>
+
+</body>
+
+</html>

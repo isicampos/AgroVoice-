@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AgroVoice | Gestión Agrícola Inteligente</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f8f5;
+            color: #26382c;
+        }
+
+        /* ================================
+           NAVEGACIÓN
+        ================================= */
+
+        .landing-nav {
+
+            height: 80px;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 60px;
+
+            box-shadow:
+                0 2px 12px
+                rgba(0,0,0,.06);
+
+        }
+
+        .landing-logo {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+        .landing-logo img {
+
+            width: 48px;
+
+            height: 48px;
+
+            object-fit: contain;
+
+        }
+
+        .landing-logo span {
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            color: #1b6d2b;
+
+        }
+
+
+        .landing-menu {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 35px;
+
+        }
+
+        .landing-menu a {
+
+            text-decoration: none;
+
+            color: #3f4943;
+
+            font-weight: 600;
+
+            transition: .2s;
+
+        }
+
+        .landing-menu a:hover {
+
+            color: #1b6d2b;
+
+        }
+
+
+        .btn-login {
+
+            background: #2e7d32;
+
+            color: white !important;
+
+            padding: 12px 22px;
+
+            border-radius: 9px;
+
+        }
+
+        .btn-login:hover {
+
+            background: #1b5e20;
+
+        }
+
+
+        /* ================================
+           HERO
+        ================================= */
+
+        .hero {
+
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 50px 7%;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #f4f8f4,
+                    #edf5ee
+                );
+
+        }
+
+
+        .hero-content {
+
+            max-width: 760px;
+
+        }
+
+
+        .hero-content h1 {
+
+            font-size: 68px;
+
+            line-height: 1.05;
+
+            margin: 0 0 22px;
+
+            color: #176528;
+
+            font-weight: 800;
+
+        }
+
+
+        .hero-content h2 {
+
+            font-size: 30px;
+
+            line-height: 1.3;
+
+            color: #4d5a51;
+
+            margin: 0 0 25px;
+
+        }
+
+
+        .hero-content p {
+
+            font-size: 20px;
+
+            line-height: 1.8;
+
+            color: #5f6c63;
+
+            margin-bottom: 35px;
+
+            max-width: 760px;
+
+        }
+
+
+        /* ================================
+           BOTONES
+        ================================= */
+
+        .hero-buttons {
+
+            display: flex;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .hero-btn {
+
+            min-width: 170px;
+
+            padding: 17px 25px;
+
+            border-radius: 11px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            transition: .2s;
+
+        }
+
+
+        .hero-btn-primary {
+
+            background: #2e7d32;
+
+            color: white;
+
+        }
+
+
+        .hero-btn-primary:hover {
+
+            background: #1b5e20;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        .hero-btn-secondary {
+
+            background: white;
+
+            color: #2e7d32;
+
+            border: 2px solid #2e7d32;
+
+        }
+
+
+        .hero-btn-secondary:hover {
+
+            background: #edf7ee;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* ================================
+           CARACTERÍSTICAS
+        ================================= */
+
+        .caracteristicas {
+
+            padding: 70px 7%;
+
+            background: white;
+
+        }
+
+
+        .caracteristicas h2 {
+
+            text-align: center;
+
+            color: #145c28;
+
+            font-size: 34px;
+
+            margin-bottom: 45px;
+
+        }
+
+
+        .caracteristicas-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 25px;
+
+            max-width: 1200px;
+
+            margin: auto;
+
+        }
+
+
+        .caracteristica {
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            background: #f5faf5;
+
+            border: 1px solid #e1ebe2;
+
+            text-align: center;
+
+        }
+
+
+        .caracteristica-icono {
+
+            font-size: 42px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .caracteristica h3 {
+
+            color: #145c28;
+
+            font-size: 20px;
+
+        }
+
+
+        .caracteristica p {
+
+            color: #68756d;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* ================================
+           CONTACTO
+        ================================= */
+
+        .contacto {
+
+            padding: 60px 7%;
+
+            text-align: center;
+
+            background: #edf5ee;
+
+        }
+
+
+        .contacto h2 {
+
+            color: #145c28;
+
+            font-size: 32px;
+
+        }
+
+
+        .contacto p {
+
+            color: #68756d;
+
+            font-size: 16px;
+
+            line-height: 1.7;
+
+        }
+
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        footer {
+
+            background: #0d5527;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+
+            font-size: 13px;
+
+        }
+
+
+        /* ================================
+           CELULAR
+        ================================= */
+
+        @media(max-width: 800px) {
+
+            .landing-nav {
+
+                padding: 0 20px;
+
+            }
+
+            .landing-menu {
+
+                gap: 12px;
+
+            }
+
+            .landing-menu a:not(.btn-login) {
+
+                display: none;
+
+            }
+
+            .hero {
+
+                padding: 60px 25px;
+
+            }
+
+            .hero-content h1 {
+
+                font-size: 48px;
+
+            }
+
+            .hero-content h2 {
+
+                font-size: 24px;
+
+            }
+
+            .hero-content p {
+
+                font-size: 17px;
+
+            }
+
+            .caracteristicas-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     NAVEGACIÓN
+====================================== -->
+
+<header class="landing-nav">
+
+
+    <div class="landing-logo">
+
+        <img
+            src="/static/img/logo.png"
+            alt="AgroVoice"
+        >
+
+        <span>
+            AgroVoice
+        </span>
+
+    </div>
+
+
+    <nav class="landing-menu">
+
+        <a href="/">
+            Inicio
+        </a>
+
+        <a href="#caracteristicas">
+            Características
+        </a>
+
+        <a href="#contacto">
+            Contacto
+        </a>
+
+        <a
+            href="/login_web"
+            class="btn-login"
+        >
+            Iniciar sesión
+        </a>
+
+    </nav>
+
+
+</header>
+
+
+<!-- =====================================
+     HERO
+====================================== -->
+
+<section class="hero">
+
+
+    <div class="hero-content">
+
+
+        <h1>
+            AgroVoice
+        </h1>
+
+
+        <h2>
+            Plataforma Inteligente para la
+            Gestión Agrícola
+        </h2>
+
+
+        <p>
+
+            Registra labores agrícolas mediante voz,
+            administra productores, predios y cuarteles,
+            genera reportes automáticos y centraliza
+            toda la información en un solo lugar.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+
+            <a
+                href="/login_web"
+                class="hero-btn hero-btn-primary"
+            >
+                Iniciar sesión
+            </a>
+
+
+            <a
+                href="/registro_web"
+                class="hero-btn hero-btn-secondary"
+            >
+                Crear cuenta
+            </a>
+
+
+            <a
+                href="#caracteristicas"
+                class="hero-btn hero-btn-secondary"
+            >
+                Conocer AgroVoice
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================
+     CARACTERÍSTICAS
+====================================== -->
+
+<section
+    class="caracteristicas"
+    id="caracteristicas"
+>
+
+
+    <h2>
+        Todo tu campo en un solo lugar 🌱
+    </h2>
+
+
+    <div class="caracteristicas-grid">
+
+
+        <div class="caracteristica">
+
+            <div class="caracteristica-icono">
+                🎙️
+            </div>
+
+            <h3>
+                Registro por voz
+            </h3>
+
+            <p>
+                Registra labores agrícolas
+                de manera rápida y sencilla.
+            </p>
+
+        </div>
+
+
+        <div class="caracteristica">
+
+            <div class="caracteristica-icono">
+                🌱
+            </div>
+
+            <h3>
+                Gestión agrícola
+            </h3>
+
+            <p>
+                Organiza productores,
+                predios, cuarteles y cultivos.
+            </p>
+
+        </div>
+
+
+        <div class="caracteristica">
+
+            <div class="caracteristica-icono">
+                📊
+            </div>
+
+            <h3>
+                Reportes
+            </h3>
+
+            <p>
+                Genera reportes y descarga
+                tus datos en Excel y PDF.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- =====================================
+     CONTACTO
+====================================== -->
+
+<section
+    class="contacto"
+    id="contacto"
+>
+
+
+    <h2>
+        Contacto
+    </h2>
+
+
+    <p>
+
+        <strong>
+            Isidora Campos
+        </strong>
+
+        <br>
+
+        isidoraandrea7@gmail.com
+
+        <br>
+
+        +56 9 9292 4600
+
+        <br>
+
+        Chile
+
+    </p>
+
+
+</section>
+
+
+<!-- =====================================
+     FOOTER
+====================================== -->
+
+<footer>
+
+    AgroVoice · Sistema Inteligente
+    de Registro Agrícola · 2026
+
+</footer>
+
+
+</body>
+
+</html>

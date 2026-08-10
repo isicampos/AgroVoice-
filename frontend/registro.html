@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Crear cuenta | AgroVoice</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+
+
+    <style>
+
+        /* =====================================
+           PAGINA DE REGISTRO
+        ===================================== */
+
+        .registro-page {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 40px 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef7ef 0%,
+                    #f8faf8 50%,
+                    #e9f3eb 100%
+                );
+
+        }
+
+
+        /* =====================================
+           TARJETA
+        ===================================== */
+
+        .registro-card {
+
+            width: 100%;
+
+            max-width: 500px;
+
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 24px;
+
+            border: 1px solid #e1e9e2;
+
+            box-shadow:
+                0 18px 45px
+                rgba(20, 55, 35, .12);
+
+        }
+
+
+        /* =====================================
+           LOGO
+        ===================================== */
+
+        .registro-logo {
+
+            text-align: center;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .registro-logo img {
+
+            width: 120px;
+
+            height: 120px;
+
+            object-fit: contain;
+
+        }
+
+
+        /* =====================================
+           TITULO
+        ===================================== */
+
+        .registro-card h1 {
+
+            text-align: center;
+
+            color: #1b5e20;
+
+            font-size: 32px;
+
+            margin: 10px 0 8px;
+
+        }
+
+
+        .registro-subtitulo {
+
+            text-align: center;
+
+            color: #6b786f;
+
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        /* =====================================
+           CAMPOS
+        ===================================== */
+
+        .registro-campo {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .registro-campo label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #34483b;
+
+            font-weight: 700;
+
+            font-size: 14px;
+
+        }
+
+
+        .registro-campo input,
+
+        .registro-campo select {
+
+            width: 100%;
+
+            height: 50px;
+
+            padding: 0 14px;
+
+            box-sizing: border-box;
+
+            border: 1px solid #d3ded5;
+
+            border-radius: 11px;
+
+            background: #fbfdfb;
+
+            color: #26382c;
+
+            font-size: 15px;
+
+            outline: none;
+
+            transition: .2s;
+
+        }
+
+
+        .registro-campo input::placeholder {
+
+            color: #9aa59e;
+
+        }
+
+
+        .registro-campo input:focus,
+
+        .registro-campo select:focus {
+
+            border-color: #2e7d32;
+
+            background: white;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(46, 125, 50, .10);
+
+        }
+
+
+        /* =====================================
+           BOTON CREAR CUENTA
+        ===================================== */
+
+        .btn-crear-cuenta {
+
+            width: 100%;
+
+            height: 52px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            background: #1b6d2b;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            margin-top: 5px;
+
+            transition: .2s;
+
+        }
+
+
+        .btn-crear-cuenta:hover {
+
+            background: #14551f;
+
+            transform: translateY(-1px);
+
+        }
+
+
+        /* =====================================
+           MENSAJE
+        ===================================== */
+
+        #mensaje {
+
+            text-align: center;
+
+            min-height: 20px;
+
+            margin-top: 15px;
+
+            color: #c62828;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =====================================
+           VOLVER AL LOGIN
+        ===================================== */
+
+        .registro-login {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid #edf1ed;
+
+            color: #68756d;
+
+            font-size: 14px;
+
+        }
+
+
+        .registro-login a {
+
+            color: #2e7d32;
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+        }
+
+
+        .registro-login a:hover {
+
+            text-decoration: underline;
+
+        }
+
+
+        /* =====================================
+           PIE
+        ===================================== */
+
+        .registro-footer {
+
+            text-align: center;
+
+            color: #8a958e;
+
+            font-size: 11px;
+
+            margin-top: 20px;
+
+        }
+
+
+        /* =====================================
+           CELULAR
+        ===================================== */
+
+        @media (max-width: 600px) {
+
+            .registro-page {
+
+                padding: 25px 15px;
+
+            }
+
+
+            .registro-card {
+
+                padding: 28px 22px;
+
+                border-radius: 20px;
+
+            }
+
+
+            .registro-logo img {
+
+                width: 100px;
+
+                height: 100px;
+
+            }
+
+
+            .registro-card h1 {
+
+                font-size: 27px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================
+         REGISTRO
+    ====================================== -->
+
+    <main class="registro-page">
+
+
+        <section class="registro-card">
+
+
+            <!-- =================================
+                 LOGO
+            ================================== -->
+
+            <div class="registro-logo">
+
+                <img
+                    src="/static/img/logo.png"
+                    alt="Logo AgroVoice"
+                >
+
+            </div>
+
+
+            <!-- =================================
+                 TITULO
+            ================================== -->
+
+            <h1>
+
+                Crear cuenta
+
+            </h1>
+
+
+            <p class="registro-subtitulo">
+
+                Crea tu cuenta para comenzar a gestionar
+                la información agrícola en AgroVoice.
+
+            </p>
+
+
+            <!-- =================================
+                 NOMBRE PERSONA O EMPRESA
+            ================================== -->
+
+            <div class="registro-campo">
+
+                <label for="nombre">
+
+                    Nombre de persona o empresa
+
+                </label>
+
+
+                <input
+
+                    id="nombre"
+
+                    type="text"
+
+                    placeholder="Ej: Agrícola Los Tilos"
+
+                    autocomplete="name"
+
+                    required
+
+                >
+
+            </div>
+
+
+            <!-- =================================
+                 CORREO
+            ================================== -->
+
+            <div class="registro-campo">
+
+                <label for="correo">
+
+                    Correo electrónico
+
+                </label>
+
+
+                <input
+
+                    id="correo"
+
+                    type="email"
+
+                    placeholder="ejemplo@correo.cl"
+
+                    autocomplete="email"
+
+                    required
+
+                >
+
+            </div>
+
+
+            <!-- =================================
+                 CONTRASEÑA
+            ================================== -->
+
+            <div class="registro-campo">
+
+                <label for="password">
+
+                    Contraseña
+
+                </label>
+
+
+                <input
+
+                    id="password"
+
+                    type="password"
+
+                    placeholder="Ingresa una contraseña"
+
+                    autocomplete="new-password"
+
+                    required
+
+                >
+
+            </div>
+
+
+            <!-- =================================
+                 TIPO DE USUARIO
+            ================================== -->
+
+            <div class="registro-campo">
+
+                <label for="rol">
+
+                    Tipo de usuario
+
+                </label>
+
+
+                <select id="rol">
+
+
+                    <option value="Productor">
+
+                        Productor / Agricultor
+
+                    </option>
+
+
+                    <option value="Jefe o Dueño de Predio">
+
+                        Jefe o Dueño de Predio
+
+                    </option>
+
+
+                    <option value="Ingeniero Agrónomo">
+
+                        Ingeniero/a Agrónomo/a
+
+                    </option>
+
+
+                    <option value="Asesor Técnico">
+
+                        Asesor/a Técnico/a
+
+                    </option>
+
+
+                    <option value="Administrador de Predio">
+
+                        Administrador/a de Predio
+
+                    </option>
+
+
+                    <option value="Encargado Agrícola">
+
+                        Encargado/a Agrícola
+
+                    </option>
+
+
+                    <option value="Investigador">
+
+                        Investigador/a
+
+                    </option>
+
+
+                    <option value="Otro">
+
+                        Otro
+
+                    </option>
+
+
+                </select>
+
+            </div>
+
+
+            <!-- =================================
+                 BOTON
+            ================================== -->
+
+            <button
+
+                type="button"
+
+                class="btn-crear-cuenta"
+
+                onclick="registrar()"
+
+            >
+
+                Crear cuenta
+
+            </button>
+
+
+            <!-- =================================
+                 MENSAJE JAVASCRIPT
+            ================================== -->
+
+            <p id="mensaje"></p>
+
+
+            <!-- =================================
+                 LOGIN
+            ================================== -->
+
+            <div class="registro-login">
+
+                ¿Ya tienes una cuenta?
+
+                <a href="/login_web">
+
+                    Iniciar sesión
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================
+                 FOOTER
+            ================================== -->
+
+            <div class="registro-footer">
+
+                AgroVoice · Sistema Inteligente
+                de Registro Agrícola · 2026
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
+
+    <script src="/static/js/registro.js"></script>
+
+
+</body>
+
+</html>

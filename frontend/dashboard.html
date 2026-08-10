@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | AgroVoice</title>
+
+    <link rel="stylesheet"
+          href="/static/css/style.css">
+          <style>
+
+/* ================================
+   AGROVOICE DASHBOARD
+================================ */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f7f5;
+    color:#26352b;
+}
+
+a{
+    text-decoration:none;
+}
+
+
+/* ================================
+   ESTRUCTURA
+================================ */
+
+.app-shell{
+    display:flex;
+    min-height:100vh;
+}
+
+
+/* ================================
+   SIDEBAR
+================================ */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:260px;
+    height:100vh;
+    background:#0f5428;
+    color:white;
+    padding:25px 18px;
+    display:flex;
+    flex-direction:column;
+    z-index:100;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:5px 10px 30px;
+    border-bottom:1px solid rgba(255,255,255,.15);
+    margin-bottom:25px;
+}
+
+.brand img{
+    width:52px;
+    height:52px;
+    object-fit:contain;
+    background:white;
+    border-radius:12px;
+}
+
+.brand strong{
+    display:block;
+    font-size:22px;
+}
+
+.brand small{
+    display:block;
+    color:#cde4d1;
+    margin-top:4px;
+    font-size:11px;
+}
+
+.sidebar nav{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.sidebar nav a,
+.sidebar-bottom a{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    color:white;
+    padding:14px 16px;
+    border-radius:11px;
+    font-size:15px;
+    transition:.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+    background:#26733a;
+}
+
+.menu-icon{
+    width:24px;
+    text-align:center;
+    font-size:19px;
+}
+
+.sidebar-bottom{
+    margin-top:auto;
+}
+
+
+/* ================================
+   CONTENIDO
+================================ */
+
+.main{
+    margin-left:260px;
+    width:calc(100% - 260px);
+    padding:35px 45px;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.eyebrow{
+    color:#2e7d32;
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    margin-bottom:8px;
+}
+
+.dashboard-header h1{
+    font-size:34px;
+    color:#163d22;
+}
+
+.header-subtitle{
+    color:#68756d;
+    margin-top:7px;
+}
+
+.header-user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:white;
+    padding:10px 18px;
+    border-radius:14px;
+    box-shadow:0 4px 15px rgba(0,0,0,.06);
+}
+
+.user-avatar{
+    width:45px;
+    height:45px;
+    background:#dff1df;
+    color:#1b5e20;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.header-user small{
+    display:block;
+    color:#777;
+    margin-top:3px;
+}
+
+
+/* ================================
+   HERO
+================================ */
+
+.dashboard-hero{
+    min-height:240px;
+    border-radius:22px;
+    padding:40px;
+    margin-bottom:25px;
+    position:relative;
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            100deg,
+            #e5f3df 0%,
+            #d3e9c9 55%,
+            #b5d39f 100%
+        );
+
+    box-shadow:0 8px 25px rgba(0,0,0,.07);
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+    max-width:600px;
+}
+
+.hero-tag{
+    color:#2e7d32;
+    font-size:12px;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.hero-content h2{
+    font-size:38px;
+    line-height:1.15;
+    color:#155525;
+    margin:12px 0;
+}
+
+.hero-content p{
+    color:#526357;
+    line-height:1.6;
+    margin-bottom:22px;
+}
+
+.hero-button{
+    display:inline-block;
+    background:#1b6d2b;
+    color:white;
+    padding:13px 24px;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.hero-button:hover{
+    background:#124d1e;
+}
+
+.hero-logo{
+    position:absolute;
+    right:50px;
+    bottom:-45px;
+    opacity:.18;
+}
+
+.hero-logo img{
+    width:300px;
+}
+
+
+/* ================================
+   TARJETAS
+================================ */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:white;
+    padding:23px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    gap:17px;
+    box-shadow:0 5px 20px rgba(0,0,0,.06);
+    border:1px solid #e5ebe6;
+}
+
+.stat-icon{
+    width:55px;
+    height:55px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.stat-title{
+    display:block;
+    color:#68756d;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.stat strong{
+    display:block;
+    color:#142319;
+    font-size:35px;
+    margin:3px 0;
+}
+
+.stat small{
+    color:#7c887f;
+}
+
+.stat-green .stat-icon{
+    background:#dff2dc;
+    color:#278033;
+}
+
+.stat-blue .stat-icon{
+    background:#deeffb;
+    color:#287eb5;
+}
+
+.stat-orange .stat-icon{
+    background:#ffead2;
+    color:#dc7215;
+}
+
+.stat-purple .stat-icon{
+    background:#eadcf7;
+    color:#824bb5;
+}
+
+
+/* ================================
+   CONTENIDO
+================================ */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:1fr 1.2fr;
+    gap:22px;
+}
+
+.dashboard-card{
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,.06);
+    border:1px solid #e5ebe6;
+}
+
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.card-kicker{
+    display:block;
+    color:#7b897f;
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:1px;
+    margin-bottom:5px;
+}
+
+.card-header h2{
+    color:#183d23;
+    font-size:21px;
+}
+
+.view-all{
+    color:#2e7d32;
+    font-weight:bold;
+    font-size:13px;
+}
+
+
+/* ================================
+   GRÁFICO
+================================ */
+
+.bar-chart{
+    min-height:230px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:17px;
+}
+
+.bar-label{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:6px;
+    font-size:13px;
+}
+
+.bar-label strong{
+    color:#267832;
+}
+
+.bar-track{
+    width:100%;
+    height:13px;
+    background:#edf2ee;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.bar-fill{
+    height:100%;
+    background:#2e7d32;
+    border-radius:20px;
+}
+
+
+/* ================================
+   TABLA
+================================ */
+
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
+.data-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.data-table th{
+    background:#f3f7f3;
+    padding:13px;
+    text-align:left;
+    font-size:12px;
+    color:#4c5c51;
+}
+
+.data-table td{
+    padding:13px;
+    border-bottom:1px solid #edf0ed;
+    font-size:13px;
+}
+
+.data-table tr:hover{
+    background:#f8fbf8;
+}
+
+.labor-badge{
+    background:#e7f4e8;
+    color:#267332;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+
+/* ================================
+   ACCESOS
+================================ */
+
+.quick-actions{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-top:22px;
+}
+
+.quick-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:18px;
+    border-radius:15px;
+    transition:.2s;
+}
+
+.quick-card:hover{
+    transform:translateY(-3px);
+}
+
+.quick-card strong{
+    display:block;
+    color:#25372b;
+    font-size:14px;
+}
+
+.quick-card small{
+    display:block;
+    color:#68756d;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.quick-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.arrow{
+    margin-left:auto;
+    font-size:20px;
+}
+
+.quick-card.green{
+    background:#e9f7e8;
+}
+
+.quick-card.blue{
+    background:#eaf5fc;
+}
+
+.quick-card.orange{
+    background:#fff4e5;
+}
+
+.quick-card.purple{
+    background:#f4ecfb;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+.dashboard-footer{
+    text-align:center;
+    color:#7d8981;
+    font-size:12px;
+    padding:30px 0 10px;
+}
+
+.dashboard-footer span{
+    color:#2e7d32;
+    font-weight:bold;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media(max-width:1100px){
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .quick-actions{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:210px;
+    }
+
+    .main{
+        margin-left:210px;
+        width:calc(100% - 210px);
+        padding:25px;
+    }
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        width:100%;
+        padding:20px;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .quick-actions{
+        grid-template-columns:1fr;
+    }
+
+    .dashboard-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .dashboard-hero{
+        padding:25px;
+    }
+
+    .hero-content h2{
+        font-size:28px;
+    }
+
+    .hero-logo{
+        display:none;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =========================================
+         MENÚ LATERAL
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <img src="/static/img/logo.png"
+                 alt="Logo AgroVoice">
+
+            <div>
+
+                <strong>AgroVoice</strong>
+
+                <small>Gestión agrícola inteligente</small>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a href="/dashboard"
+               class="active">
+
+                <span class="menu-icon">⌂</span>
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="/productores_web">
+
+                <span class="menu-icon">◉</span>
+
+                <span>Productores</span>
+
+            </a>
+
+
+            <a href="/predios_web">
+
+                <span class="menu-icon">▣</span>
+
+                <span>Predios</span>
+
+            </a>
+
+
+            <a href="/cuarteles_web">
+
+                <span class="menu-icon">▦</span>
+
+                <span>Cuarteles</span>
+
+            </a>
+
+
+            <a href="/registros_web">
+
+                <span class="menu-icon">▤</span>
+
+                <span>Registros</span>
+
+            </a>
+
+
+            <a href="/reportes_web">
+
+                <span class="menu-icon">▥</span>
+
+                <span>Reportes</span>
+
+            </a>
+
+
+            <a href="/configuracion_web">
+
+                <span class="menu-icon">⚙</span>
+
+                <span>Configuración</span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="/logout"
+               class="logout">
+
+                <span class="menu-icon">↪</span>
+
+                <span>Cerrar sesión</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
+
+    <main class="main">
+
+
+        <!-- CABECERA -->
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    CENTRO DE GESTIÓN AGRÍCOLA
+                </p>
+
+                <h1>
+                    ¡Bienvenido,
+                    <span id="nombre_usuario">Usuario</span>!
+                </h1>
+
+                <p class="header-subtitle">
+
+                    Administra la información de tus
+                    productores, predios y labores agrícolas.
+
+                </p>
+
+            </div>
+
+
+            <div class="header-user">
+
+                <div class="user-avatar">
+
+                    <span id="inicial_usuario">
+                        U
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong id="nombre_usuario_header">
+                        Usuario
+                    </strong>
+
+                    <small>
+                        <span id="rol_usuario">
+                            Usuario
+                        </span>
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================
+             BANNER AGROVOICE
+        ====================================== -->
+
+        <section class="dashboard-hero">
+
+            <div class="hero-content">
+
+                <span class="hero-tag">
+                    AGROVOICE
+                </span>
+
+                <h2>
+                    Gestiona tu campo
+                    <br>
+                    de forma inteligente
+                </h2>
+
+                <p>
+
+                    Centraliza tus registros agrícolas,
+                    organiza la información y toma
+                    mejores decisiones.
+
+                </p>
+
+
+                <a href="/registros_web"
+                   class="hero-button">
+
+                    + Nuevo registro
+
+                </a>
+
+            </div>
+
+
+            <div class="hero-logo">
+
+                <img src="/static/img/logo.png"
+                     alt="AgroVoice">
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             TARJETAS PRINCIPALES
+        ====================================== -->
+
+        <section class="stats">
+
+
+            <article class="stat stat-green">
+
+                <div class="stat-icon">
+                    ◉
+                </div>
+
+                <div>
+
+                    <span class="stat-title">
+                        Productores
+                    </span>
+
+                    <strong id="total_productores">
+                        0
+                    </strong>
+
+                    <small>
+                        Registrados
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat stat-blue">
+
+                <div class="stat-icon">
+                    ▣
+                </div>
+
+                <div>
+
+                    <span class="stat-title">
+                        Predios
+                    </span>
+
+                    <strong id="total_predios">
+                        0
+                    </strong>
+
+                    <small>
+                        Registrados
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat stat-orange">
+
+                <div class="stat-icon">
+                    ▦
+                </div>
+
+                <div>
+
+                    <span class="stat-title">
+                        Cuarteles
+                    </span>
+
+                    <strong id="total_cuarteles">
+                        0
+                    </strong>
+
+                    <small>
+                        En producción
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="stat stat-purple">
+
+                <div class="stat-icon">
+                    ▤
+                </div>
+
+                <div>
+
+                    <span class="stat-title">
+                        Registros
+                    </span>
+
+                    <strong id="total_registros">
+                        0
+                    </strong>
+
+                    <small>
+                        Registros agrícolas
+                    </small>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =====================================
+             CONTENIDO INFERIOR
+        ====================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- GRÁFICO -->
+
+            <article class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <span class="card-kicker">
+                            ANÁLISIS
+                        </span>
+
+                        <h2>
+                            Registros por cultivo
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div id="grafico_cultivos"
+                     class="bar-chart">
+
+                    <div class="chart-empty">
+
+                        Cargando información...
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- ÚLTIMOS REGISTROS -->
+
+            <article class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <span class="card-kicker">
+                            ACTIVIDAD
+                        </span>
+
+                        <h2>
+                            Últimos registros
+                        </h2>
+
+                    </div>
+
+
+                    <a href="/registros_web"
+                       class="view-all">
+
+                        Ver todos →
+
+                    </a>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table
+                        class="data-table"
+                        id="tabla_registros">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Fecha</th>
+
+                                <th>Cultivo</th>
+
+                                <th>Labor</th>
+
+                                <th>Predio</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td colspan="4"
+                                    class="empty">
+
+                                    Cargando registros...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =====================================
+             ACCESOS RÁPIDOS
+        ====================================== -->
+
+        <section class="quick-actions">
+
+
+            <a href="/productores_web"
+               class="quick-card green">
+
+                <span class="quick-icon">
+                    ◉
+                </span>
+
+                <div>
+
+                    <strong>
+                        Gestionar productores
+                    </strong>
+
+                    <small>
+                        Ver y administrar productores
+                    </small>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a href="/predios_web"
+               class="quick-card blue">
+
+                <span class="quick-icon">
+                    ▣
+                </span>
+
+                <div>
+
+                    <strong>
+                        Gestionar predios
+                    </strong>
+
+                    <small>
+                        Administrar predios agrícolas
+                    </small>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a href="/cuarteles_web"
+               class="quick-card orange">
+
+                <span class="quick-icon">
+                    ▦
+                </span>
+
+                <div>
+
+                    <strong>
+                        Gestionar cuarteles
+                    </strong>
+
+                    <small>
+                        Organizar sectores productivos
+                    </small>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a href="/registros_web"
+               class="quick-card purple">
+
+                <span class="quick-icon">
+                    ▤
+                </span>
+
+                <div>
+
+                    <strong>
+                        Ver registros
+                    </strong>
+
+                    <small>
+                        Revisar labores agrícolas
+                    </small>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+        </section>
+
+
+        <!-- =====================================
+             PIE
+        ====================================== -->
+
+        <footer class="dashboard-footer">
+
+            <span>
+                AgroVoice
+            </span>
+
+            · Registro agrícola inteligente
+
+            · 2026
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/dashboard.js"></script>
+
+</body>
+
+</html>
