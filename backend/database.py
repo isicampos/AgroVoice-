@@ -419,78 +419,51 @@ def guardar_productor(
 # ==========================================
 
 def crear_usuario(
-
     nombre,
-
     correo,
-
     password,
-
     rol
-
 ):
 
-    conexion = conectar()
+    correo = correo.strip().lower()
 
+    conexion = conectar()
     cursor = conexion.cursor()
 
     cursor.execute("""
-
-    INSERT INTO usuarios(
-
-        nombre,
-
-        correo,
-
-        password,
-
-        rol
-
-    )
-
-    VALUES(?,?,?,?)
-
+        INSERT INTO usuarios(
+            nombre,
+            correo,
+            password,
+            rol
+        )
+        VALUES(?,?,?,?)
     """,(
-
         nombre,
-
         correo,
-
         password,
-
         rol
-
     ))
 
     conexion.commit()
-
     conexion.close()
-
 
 def obtener_usuario(correo):
 
-    conexion = conectar()
+    correo = correo.strip().lower()
 
+    conexion = conectar()
     cursor = conexion.cursor()
 
     cursor.execute("""
-
-    SELECT
-
-        id,
-
-        nombre,
-
-        correo,
-
-        password,
-
-        rol
-
-    FROM usuarios
-
-    WHERE correo=?
-
+        SELECT
+            id,
+            nombre,
+            correo,
+            password,
+            rol
+        FROM usuarios
+        WHERE correo=?
     """,(correo,))
 
     usuario = cursor.fetchone()
