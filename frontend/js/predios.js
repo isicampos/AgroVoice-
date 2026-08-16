@@ -1,17 +1,18 @@
-cargarProductores();
-cargarPredios();
+// ==========================================
+// CARGAR PRODUCTORES
+// ==========================================
 
 async function cargarProductores() {
 
     try {
 
-        const r = await fetch("/productores");
+        const respuesta = await fetch("/productores");
 
-        if (!r.ok) {
+        if (!respuesta.ok) {
             throw new Error("No se pudieron cargar los productores");
         }
 
-        const datos = await r.json();
+        const datos = await respuesta.json();
 
         const combo = document.getElementById("productor");
 
@@ -37,17 +38,21 @@ async function cargarProductores() {
 }
 
 
+// ==========================================
+// CARGAR PREDIOS
+// ==========================================
+
 async function cargarPredios() {
 
     try {
 
-        const r = await fetch("/predios");
+        const respuesta = await fetch("/predios");
 
-        if (!r.ok) {
-            throw new Error("Error al cargar predios");
+        if (!respuesta.ok) {
+            throw new Error("No se pudieron cargar los predios");
         }
 
-        const datos = await r.json();
+        const datos = await respuesta.json();
 
         const tabla = document.getElementById("tabla");
 
@@ -68,10 +73,10 @@ async function cargarPredios() {
                 <tr>
                     <td>${p.id}</td>
                     <td>${p.nombre}</td>
-                    <td>${p.productor || ""}</td>
-                    <td>${p.superficie || ""}</td>
-                    <td>${p.region || ""}</td>
-                    <td>${p.comuna || ""}</td>
+                    <td>${p.productor}</td>
+                    <td>${p.superficie}</td>
+                    <td>${p.region}</td>
+                    <td>${p.comuna}</td>
                 </tr>
             `;
 
@@ -84,30 +89,29 @@ async function cargarPredios() {
         alert("No se pudieron cargar los predios.");
 
     }
-
 }
 
 
+// ==========================================
+// GUARDAR PREDIO
+// ==========================================
+
 async function guardarPredio() {
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const productor = document.getElementById("productor").value;
-    const superficie = document.getElementById("superficie").value;
-    const region = document.getElementById("region").value.trim();
-    const comuna = document.getElementById("comuna").value.trim();
-
-
-    // Validar campos
-
-    if (!nombre || !productor || !superficie || !region || !comuna) {
-
-        alert("Completa todos los campos antes de guardar.");
-
-        return;
-    }
-
-
     try {
+
+        const nombre = document.getElementById("nombre").value.trim();
+        const productor = document.getElementById("productor").value;
+        const superficie = document.getElementById("superficie").value;
+        const region = document.getElementById("region").value.trim();
+        const comuna = document.getElementById("comuna").value.trim();
+
+        if (!nombre || !productor || !superficie || !region || !comuna) {
+
+            alert("Completa todos los campos.");
+
+            return;
+        }
 
         const respuesta = await fetch("/predios", {
 
@@ -133,50 +137,53 @@ async function guardarPredio() {
 
         });
 
-
-        // Obtener respuesta del servidor
-
-        const texto = await respuesta.text();
-
-        console.log("Respuesta del servidor:", texto);
-
-
         if (!respuesta.ok) {
 
-            alert(
-                "No se pudo guardar el predio.\n\n" +
-                "Error: " + texto
-            );
+            const errorTexto = await respuesta.text();
 
-            return;
+            console.error("Error del servidor:", errorTexto);
+
+            throw new Error("El servidor rechazó el predio.");
+
         }
 
+        const resultado = await respuesta.json();
 
-        alert("✓ Predio guardado correctamente");
+        console.log("Predio guardado:", resultado);
 
+        alert("¡Predio guardado correctamente! 🌱");
 
-        // Limpiar formulario
-
+        // Limpiar campos
         document.getElementById("nombre").value = "";
         document.getElementById("superficie").value = "";
         document.getElementById("region").value = "";
         document.getElementById("comuna").value = "";
 
-
-        // Recargar tabla
-
+        // Actualizar tabla
         cargarPredios();
-
 
     } catch (error) {
 
         console.error("Error guardando predio:", error);
 
         alert(
-            "No se pudo conectar con AgroVoice.\n\n" +
-            error
+            "No se pudo guardar el predio.\n\n" +
+            "Revisa la consola para ver el error."
         );
 
     }
 
 }
+
+
+// ==========================================
+// INICIAR
+// ==========================================
+
+window.onload = function () {
+
+    cargarProductores();
+
+    cargarPredios();
+
+};
