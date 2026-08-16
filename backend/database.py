@@ -1,6 +1,8 @@
 import sqlite3
+import os
 
-DB = "agrovoice.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB = os.path.join(BASE_DIR, "agrovoice.db")
 
 
 # ==========================================
@@ -9,7 +11,6 @@ DB = "agrovoice.db"
 
 def conectar():
     return sqlite3.connect(DB)
-
 
 # ==========================================
 # CREAR BASE DE DATOS
