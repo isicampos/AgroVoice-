@@ -12,7 +12,7 @@ async function login(){
 
         body:JSON.stringify({
 
-            correo:document.getElementById("correo").value,
+            correo:document.getElementById("correo").value.trim().toLowerCase(),
 
             password:document.getElementById("password").value
 

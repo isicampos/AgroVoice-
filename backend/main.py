@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 from fastapi.responses import StreamingResponse
@@ -6,6 +6,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from io import BytesIO
+from ia import transcribir_archivo
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -1206,3 +1207,25 @@ def exportar_pdf():
             'attachment; filename="AgroVoice_Reporte.pdf"'
         }
     )
+from fastapi import UploadFile, File
+from ia import transcribir_archivo
+
+@app.post('/transcribir')
+async def transcribir(audio: UploadFile = File(...)):
+    contenido = await audio.read()
+    texto = transcribir_archivo(contenido)
+    return {'transcripcion': texto}
+# =========================================================
+# TRANSCRIPCIÓN DE AUDIO
+# =========================================================
+
+@app.post("/transcribir")
+async def transcribir(audio: UploadFile = File(...)):
+
+    contenido = await audio.read()
+
+    texto = transcribir_archivo(contenido)
+
+    return {
+        "transcripcion": texto
+    }
