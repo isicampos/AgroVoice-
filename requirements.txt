@@ -3,3 +3,5 @@ uvicorn[standard]
 pydantic
 openpyxl
 reportlab
+openai-whisper
+
