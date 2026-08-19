@@ -4,4 +4,5 @@ pydantic
 openpyxl
 reportlab
 openai-whisper
+python-multipart
 
