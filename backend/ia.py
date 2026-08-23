@@ -1,45 +1,60 @@
-import tempfile
 import os
-import whisper
+import base64
+import httpx
 
-modelo = None
 
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-def obtener_modelo():
-
-    global modelo
-
-    if modelo is None:
-        modelo = whisper.load_model("base")
-
-    return modelo
+GEMINI_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/"
+    "gemini-2.5-flash:generateContent"
+)
 
 
 def transcribir_archivo(archivo):
 
-    modelo = obtener_modelo()
+    if not API_KEY:
+        raise Exception("No se encontró GEMINI_API_KEY en Render.")
 
-    with tempfile.NamedTemporaryFile(
-        delete=False,
-        suffix=".wav"
-    ) as temporal:
+    audio_base64 = base64.b64encode(archivo).decode("utf-8")
 
-        temporal.write(archivo)
-        ruta = temporal.name
+    datos = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": (
+                            "Transcribe exactamente este audio en español. "
+                            "Devuelve solamente la transcripción, "
+                            "sin explicaciones ni comentarios."
+                        )
+                    },
+                    {
+                        "inline_data": {
+                            "mime_type": "audio/wav",
+                            "data": audio_base64
+                        }
+                    }
+                ]
+            }
+        ]
+    }
 
-    try:
+    respuesta = httpx.post(
+        GEMINI_URL,
+        params={"key": API_KEY},
+        json=datos,
+        timeout=120
+    )
 
-        resultado = modelo.transcribe(
-            ruta,
-            language="es"
-        )
+    respuesta.raise_for_status()
 
-        return resultado.get(
-            "text",
-            ""
-        ).strip()
+    resultado = respuesta.json()
 
-    finally:
+    texto = (
+        resultado["candidates"][0]
+        ["content"]["parts"][0]
+        ["text"]
+    )
 
-        if os.path.exists(ruta):
-            os.remove(ruta)
+    return texto.strip()
