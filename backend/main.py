@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
@@ -93,15 +94,14 @@ crear_bd()
 
 app.mount(
     "/static",
-    StaticFiles(directory="../frontend"),
+    StaticFiles(directory=os.path.join(os.path.dirname(__file__), "..", "frontend")),
     name="static"
 )
 
 
 def page(nombre_archivo: str):
-
     return FileResponse(
-        f"../frontend/{nombre_archivo}"
+        os.path.join(os.path.dirname(__file__), "..", "frontend", nombre_archivo)
     )
 
 
@@ -1207,14 +1207,8 @@ def exportar_pdf():
             'attachment; filename="AgroVoice_Reporte.pdf"'
         }
     )
-from fastapi import UploadFile, File
-from ia import transcribir_archivo
 
-@app.post('/transcribir')
-async def transcribir(audio: UploadFile = File(...)):
-    contenido = await audio.read()
-    texto = transcribir_archivo(contenido)
-    return {'transcripcion': texto}
+
 # =========================================================
 # TRANSCRIPCIÓN DE AUDIO
 # =========================================================
@@ -1224,7 +1218,13 @@ async def transcribir(audio: UploadFile = File(...)):
 
     contenido = await audio.read()
 
+    print("🎙️ AUDIO RECIBIDO EN RENDER")
+    print("📦 TAMAÑO DEL AUDIO:", len(contenido))
+
     texto = transcribir_archivo(contenido)
+
+    print("✅ WHISPER TERMINÓ")
+    print("📝 TRANSCRIPCIÓN:", texto)
 
     return {
         "transcripcion": texto
