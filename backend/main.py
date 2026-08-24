@@ -35,7 +35,6 @@ from models import (
 )
 
 from database import (
-    crear_bd,
 
     # PRODUCTORES
     guardar_productor,
@@ -79,13 +78,6 @@ app = FastAPI(
     description="API oficial de AgroVoice",
     version="1.0.0"
 )
-
-
-# =========================================================
-# CREAR BASE DE DATOS
-# =========================================================
-
-crear_bd()
 
 
 # =========================================================
