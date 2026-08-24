@@ -1,422 +1,334 @@
-import sqlite3
 import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB = os.path.join(BASE_DIR, "agrovoice.db")
+import httpx
 
 
-# ==========================================
-# CONEXIÓN
-# ==========================================
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-def conectar():
-    return sqlite3.connect(DB)
 
-# ==========================================
-# CREAR BASE DE DATOS
-# ==========================================
+if not SUPABASE_URL:
+    raise Exception("Falta SUPABASE_URL en Render.")
 
-def crear_bd():
+if not SUPABASE_KEY:
+    raise Exception("Falta SUPABASE_KEY en Render.")
 
-    conexion = conectar()
-    cursor = conexion.cursor()
 
-    # -------------------------
-    # PRODUCTORES
-    # -------------------------
+BASE_URL = f"{SUPABASE_URL}/rest/v1"
 
-    cursor.execute("""
 
-    CREATE TABLE IF NOT EXISTS productores(
+HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation"
+}
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        nombre TEXT,
+# =========================================================
+# FUNCIÓN GENERAL
+# =========================================================
 
-        predio TEXT,
+def request(method, tabla, **kwargs):
 
-        cultivo TEXT
+    url = f"{BASE_URL}/{tabla}"
 
+    respuesta = httpx.request(
+        method,
+        url,
+        headers=HEADERS,
+        timeout=30,
+        **kwargs
     )
 
-    """)
+    if respuesta.status_code >= 400:
 
-    # -------------------------
-    # REGISTROS
-    # -------------------------
+        raise Exception(
+            f"Supabase error {respuesta.status_code}: "
+            f"{respuesta.text}"
+        )
 
-    cursor.execute("""
+    if not respuesta.text:
+        return []
 
-    CREATE TABLE IF NOT EXISTS registros(
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        fecha TEXT,
-
-        productor TEXT,
-
-        predio TEXT,
-
-        cuartel TEXT,
-
-        cultivo TEXT,
-
-        labor TEXT,
-
-        transcripcion TEXT
-
-    )
-
-    """)
-
-    # -------------------------
-    # USUARIOS
-    # -------------------------
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS usuarios(
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        nombre TEXT,
-
-        correo TEXT UNIQUE,
-
-        password TEXT,
-
-        rol TEXT
-
-    )
-
-    """)
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS predios(
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        nombre TEXT,
-
-        productor_id INTEGER,
-
-        superficie REAL,
-
-        region TEXT,
-
-        comuna TEXT,
-
-        FOREIGN KEY(productor_id) REFERENCES productores(id)
-
-    )
-
-    """)
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS cuarteles(
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        nombre TEXT,
-
-        predio_id INTEGER,
-
-        cultivo TEXT,
-
-        variedad TEXT,
-
-        superficie REAL,
-
-        FOREIGN KEY(predio_id) REFERENCES predios(id)
-
-    )
-
-    """)
-
-    conexion.commit()
-    conexion.close()
+    return respuesta.json()
 
 
-# ==========================================
+# =========================================================
 # PRODUCTORES
-# ==========================================
+# =========================================================
 
 def obtener_productores():
 
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    SELECT
-        id,
-        nombre,
-        predio,
-        cultivo
-
-    FROM productores
-
-    ORDER BY id
-
-    """)
-
-    datos = cursor.fetchall()
-
-    conexion.close()
-
-    return datos
-
-# ==========================================
-# REGISTROS
-# ==========================================
-
-def guardar_registro(
-
-    fecha,
-
-    productor,
-
-    predio,
-
-    cuartel,
-
-    cultivo,
-
-    labor,
-
-    transcripcion
-
-):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    INSERT INTO registros(
-
-        fecha,
-
-        productor,
-
-        predio,
-
-        cuartel,
-
-        cultivo,
-
-        labor,
-
-        transcripcion
-
+    datos = request(
+        "GET",
+        "productores",
+        params={
+            "select": "*",
+            "order": "id.asc"
+        }
     )
 
-    VALUES(?,?,?,?,?,?,?)
+    return [
+        (
+            x["id"],
+            x["nombre"],
+            x.get("predio"),
+            x.get("cultivo")
+        )
+        for x in datos
+    ]
 
-    """,(
 
-        fecha,
+def guardar_productor(nombre, predio, cultivo):
 
-        productor,
+    request(
+        "POST",
+        "productores",
+        json={
+            "nombre": nombre,
+            "predio": predio,
+            "cultivo": cultivo
+        }
+    )
 
-        predio,
 
-        cuartel,
+def actualizar_productor(id, nombre, predio, cultivo):
 
-        cultivo,
+    request(
+        "PATCH",
+        "productores",
+        params={
+            "id": f"eq.{id}"
+        },
+        json={
+            "nombre": nombre,
+            "predio": predio,
+            "cultivo": cultivo
+        }
+    )
 
-        labor,
 
-        transcripcion
+def eliminar_productor(id):
 
-    ))
+    request(
+        "DELETE",
+        "productores",
+        params={
+            "id": f"eq.{id}"
+        }
+    )
 
-    conexion.commit()
 
-    conexion.close()
+# =========================================================
+# PREDIOS
+# =========================================================
+
+def obtener_predios():
+
+    datos = request(
+        "GET",
+        "predios",
+        params={
+            "select": "*,productores(nombre)",
+            "order": "id.desc"
+        }
+    )
+
+    resultado = []
+
+    for x in datos:
+
+        productor = x.get("productores") or {}
+
+        resultado.append(
+            (
+                x["id"],
+                x["nombre"],
+                productor.get("nombre", ""),
+                x.get("superficie"),
+                x.get("region"),
+                x.get("comuna")
+            )
+        )
+
+    return resultado
+
+
+def guardar_predio(
+    nombre,
+    productor_id,
+    superficie,
+    region,
+    comuna
+):
+
+    request(
+        "POST",
+        "predios",
+        json={
+            "nombre": nombre,
+            "productor_id": productor_id,
+            "superficie": superficie,
+            "region": region,
+            "comuna": comuna
+        }
+    )
+
+
+# =========================================================
+# CUARTELES
+# =========================================================
+
+def obtener_cuarteles():
+
+    datos = request(
+        "GET",
+        "cuarteles",
+        params={
+            "select": "*,predios(nombre)",
+            "order": "id.desc"
+        }
+    )
+
+    resultado = []
+
+    for x in datos:
+
+        predio = x.get("predios") or {}
+
+        resultado.append(
+            (
+                x["id"],
+                x["nombre"],
+                predio.get("nombre", ""),
+                x.get("cultivo"),
+                x.get("variedad"),
+                x.get("superficie")
+            )
+        )
+
+    return resultado
+
+
+def guardar_cuartel(
+    nombre,
+    predio_id,
+    cultivo,
+    variedad,
+    superficie
+):
+
+    request(
+        "POST",
+        "cuarteles",
+        json={
+            "nombre": nombre,
+            "predio_id": predio_id,
+            "cultivo": cultivo,
+            "variedad": variedad,
+            "superficie": superficie
+        }
+    )
+
+
+# =========================================================
+# REGISTROS
+# =========================================================
+
+def guardar_registro(
+    fecha,
+    productor,
+    predio,
+    cuartel,
+    cultivo,
+    labor,
+    transcripcion
+):
+
+    request(
+        "POST",
+        "registros",
+        json={
+            "fecha": fecha,
+            "productor": productor,
+            "predio": predio,
+            "cuartel": cuartel,
+            "cultivo": cultivo,
+            "labor": labor,
+            "transcripcion": transcripcion
+        }
+    )
 
 
 def obtener_registros_bd():
 
-    conexion = conectar()
+    datos = request(
+        "GET",
+        "registros",
+        params={
+            "select": "*",
+            "order": "id.desc"
+        }
+    )
 
-    cursor = conexion.cursor()
+    return [
+        (
+            x["id"],
+            x.get("fecha"),
+            x.get("productor"),
+            x.get("predio"),
+            x.get("cuartel"),
+            x.get("cultivo"),
+            x.get("labor"),
+            x.get("transcripcion")
+        )
+        for x in datos
+    ]
 
-    cursor.execute("""
 
-    SELECT
+def actualizar_registro(
+    id_registro,
+    fecha,
+    productor,
+    predio,
+    cuartel,
+    cultivo,
+    labor,
+    transcripcion
+):
 
-        id,
+    request(
+        "PATCH",
+        "registros",
+        params={
+            "id": f"eq.{id_registro}"
+        },
+        json={
+            "fecha": fecha,
+            "productor": productor,
+            "predio": predio,
+            "cuartel": cuartel,
+            "cultivo": cultivo,
+            "labor": labor,
+            "transcripcion": transcripcion
+        }
+    )
 
-        fecha,
-
-        productor,
-
-        predio,
-
-        cuartel,
-
-        cultivo,
-
-        labor,
-
-        transcripcion
-
-    FROM registros
-
-    ORDER BY id DESC
-
-    """)
-
-    datos = cursor.fetchall()
-
-    conexion.close()
-
-    return datos
-
-# ==========================================
-# ELIMINAR REGISTRO
-# ==========================================
 
 def eliminar_registro(id_registro):
 
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    DELETE FROM registros
-
-    WHERE id=?
-
-    """,(id_registro,))
-
-    conexion.commit()
-
-    conexion.close()
-
-    # ==========================================
-# ACTUALIZAR REGISTRO
-# ==========================================
-
-def actualizar_registro(
-
-    id_registro,
-
-    fecha,
-
-    productor,
-
-    predio,
-
-    cuartel,
-
-    cultivo,
-
-    labor,
-
-    transcripcion
-
-):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    UPDATE registros
-
-    SET
-
-        fecha=?,
-
-        productor=?,
-
-        predio=?,
-
-        cuartel=?,
-
-        cultivo=?,
-
-        labor=?,
-
-        transcripcion=?
-
-    WHERE id=?
-
-    """,(
-
-        fecha,
-
-        productor,
-
-        predio,
-
-        cuartel,
-
-        cultivo,
-
-        labor,
-
-        transcripcion,
-
-        id_registro
-
-    ))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-def guardar_productor(
-    nombre,
-    predio,
-    cultivo
-):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    INSERT INTO productores(
-
-        nombre,
-
-        predio,
-
-        cultivo
-
+    request(
+        "DELETE",
+        "registros",
+        params={
+            "id": f"eq.{id_registro}"
+        }
     )
 
-    VALUES(?,?,?)
 
-    """,(
-
-        nombre,
-
-        predio,
-
-        cultivo
-
-    ))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-# ==========================================
+# =========================================================
 # USUARIOS
-# ==========================================
+# =========================================================
 
 def crear_usuario(
     nombre,
@@ -427,383 +339,118 @@ def crear_usuario(
 
     correo = correo.strip().lower()
 
-    conexion = conectar()
-    cursor = conexion.cursor()
+    request(
+        "POST",
+        "usuarios",
+        json={
+            "nombre": nombre,
+            "correo": correo,
+            "password": password,
+            "rol": rol
+        }
+    )
 
-    cursor.execute("""
-        INSERT INTO usuarios(
-            nombre,
-            correo,
-            password,
-            rol
-        )
-        VALUES(?,?,?,?)
-    """,(
-        nombre,
-        correo,
-        password,
-        rol
-    ))
-
-    conexion.commit()
-    conexion.close()
 
 def obtener_usuario(correo):
 
     correo = correo.strip().lower()
 
-    conexion = conectar()
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-        SELECT
-            id,
-            nombre,
-            correo,
-            password,
-            rol
-        FROM usuarios
-        WHERE correo=?
-    """,(correo,))
-
-    usuario = cursor.fetchone()
-
-    conexion.close()
-
-    return usuario
-
-def eliminar_productor(id):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("DELETE FROM productores WHERE id=?", (id,))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-def actualizar_productor(id, nombre, predio, cultivo):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    UPDATE productores
-
-    SET
-
-        nombre=?,
-
-        predio=?,
-
-        cultivo=?
-
-    WHERE id=?
-
-    """,(
-
-        nombre,
-
-        predio,
-
-        cultivo,
-
-        id
-
-    ))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-def guardar_predio(nombre, productor_id, superficie, region, comuna):
-
-    conexion = conectar()
-
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    INSERT INTO predios(
-
-        nombre,
-
-        productor_id,
-
-        superficie,
-
-        region,
-
-        comuna
-
+    datos = request(
+        "GET",
+        "usuarios",
+        params={
+            "correo": f"eq.{correo}",
+            "select": "*"
+        }
     )
 
-    VALUES(?,?,?,?,?)
+    if not datos:
+        return None
 
-    """,(
+    usuario = datos[0]
 
-        nombre,
-
-        productor_id,
-
-        superficie,
-
-        region,
-
-        comuna
-
-    ))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-def obtener_predios():
-
-    conexion = conectar()
-    cursor = conexion.cursor()
-
-    cursor.execute("""
-
-    SELECT
-
-        predios.id,
-
-        predios.nombre,
-
-        productores.nombre,
-
-        predios.superficie,
-
-        predios.region,
-
-        predios.comuna
-
-    FROM predios
-
-    INNER JOIN productores
-
-    ON predios.productor_id=productores.id
-
-    ORDER BY predios.id DESC
-
-    """)
-
-    datos=cursor.fetchall()
-
-    conexion.close()
-
-    return datos
-
-def guardar_cuartel(nombre,predio_id,cultivo,variedad,superficie):
-
-    conexion=conectar()
-
-    cursor=conexion.cursor()
-
-    cursor.execute("""
-
-    INSERT INTO cuarteles(
-
-        nombre,
-
-        predio_id,
-
-        cultivo,
-
-        variedad,
-
-        superficie
-
+    return (
+        usuario["id"],
+        usuario["nombre"],
+        usuario["correo"],
+        usuario["password"],
+        usuario["rol"]
     )
 
-    VALUES(?,?,?,?,?)
 
-    """,(
-
-        nombre,
-
-        predio_id,
-
-        cultivo,
-
-        variedad,
-
-        superficie
-
-    ))
-
-    conexion.commit()
-
-    conexion.close()
-
-
-def obtener_cuarteles():
-
-    conexion=conectar()
-
-    cursor=conexion.cursor()
-
-    cursor.execute("""
-
-    SELECT
-
-        cuarteles.id,
-
-        cuarteles.nombre,
-
-        predios.nombre,
-
-        cuarteles.cultivo,
-
-        cuarteles.variedad,
-
-        cuarteles.superficie
-
-    FROM cuarteles
-
-    INNER JOIN predios
-
-    ON predios.id=cuarteles.predio_id
-
-    ORDER BY cuarteles.id DESC
-
-    """)
-
-    datos=cursor.fetchall()
-
-    conexion.close()
-
-    return datos
-def guardar_registro(
-    fecha,
-    productor_id,
-    predio_id,
-    cuartel_id,
-    cultivo,
-    labor,
-    descripcion
-):
-
-    conexion=conectar()
-    cursor=conexion.cursor()
-
-    cursor.execute("""
-
-    INSERT INTO registros(
-
-        fecha,
-        productor_id,
-        predio_id,
-        cuartel_id,
-        cultivo,
-        labor,
-        descripcion
-
-    )
-
-    VALUES(?,?,?,?,?,?,?)
-
-    """,(
-
-        fecha,
-        productor_id,
-        predio_id,
-        cuartel_id,
-        cultivo,
-        labor,
-        descripcion
-
-    ))
-
-    conexion.commit()
-    conexion.close()
+# =========================================================
+# DASHBOARD
+# =========================================================
 
 def total_productores():
-    conexion=conectar()
-    cursor=conexion.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM productores")
+    datos = request(
+        "GET",
+        "productores",
+        params={
+            "select": "id"
+        }
+    )
 
-    total=cursor.fetchone()[0]
-
-    conexion.close()
-
-    return total
+    return len(datos)
 
 
 def total_predios():
 
-    conexion=conectar()
-    cursor=conexion.cursor()
+    datos = request(
+        "GET",
+        "predios",
+        params={
+            "select": "id"
+        }
+    )
 
-    cursor.execute("SELECT COUNT(*) FROM predios")
-
-    total=cursor.fetchone()[0]
-
-    conexion.close()
-
-    return total
+    return len(datos)
 
 
 def total_cuarteles():
 
-    conexion=conectar()
-    cursor=conexion.cursor()
+    datos = request(
+        "GET",
+        "cuarteles",
+        params={
+            "select": "id"
+        }
+    )
 
-    cursor.execute("SELECT COUNT(*) FROM cuarteles")
-
-    total=cursor.fetchone()[0]
-
-    conexion.close()
-
-    return total
+    return len(datos)
 
 
 def total_registros():
 
-    conexion=conectar()
-    cursor=conexion.cursor()
+    datos = request(
+        "GET",
+        "registros",
+        params={
+            "select": "id"
+        }
+    )
 
-    cursor.execute("SELECT COUNT(*) FROM registros")
+    return len(datos)
 
-    total=cursor.fetchone()[0]
 
-    conexion.close()
-
-    return total
 def ultimos_registros():
 
-    conexion = conectar()
-    cursor = conexion.cursor()
+    datos = request(
+        "GET",
+        "registros",
+        params={
+            "select": "fecha,labor,transcripcion",
+            "order": "id.desc",
+            "limit": "5"
+        }
+    )
 
-    cursor.execute("""
-
-    SELECT
-
-        fecha,
-
-        labor,
-
-        descripcion
-
-    FROM registros
-
-    ORDER BY id DESC
-
-    LIMIT 5
-
-    """)
-
-    datos = cursor.fetchall()
-
-    conexion.close()
-
-    return datos
+    return [
+        (
+            x.get("fecha"),
+            x.get("labor"),
+            x.get("transcripcion")
+        )
+        for x in datos
+    ]
