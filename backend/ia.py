@@ -3,17 +3,17 @@ import base64
 import httpx
 
 
+API_KEY = os.getenv("GEMINI_API_KEY")
+
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.5-flash:generateContent"
+    "gemini-3.6-flash:generateContent"
 )
 
 
 def transcribir_archivo(archivo):
 
-    api_key = os.getenv("GEMINI_API_KEY")
-
-    if not api_key:
+    if not API_KEY:
         raise Exception("No se encontró GEMINI_API_KEY en Render.")
 
     audio_base64 = base64.b64encode(archivo).decode("utf-8")
@@ -21,7 +21,6 @@ def transcribir_archivo(archivo):
     datos = {
         "contents": [
             {
-                "role": "user",
                 "parts": [
                     {
                         "text": (
@@ -43,19 +42,15 @@ def transcribir_archivo(archivo):
 
     respuesta = httpx.post(
         GEMINI_URL,
-        headers={
-            "x-goog-api-key": api_key,
-            "Content-Type": "application/json"
-        },
+        params={"key": API_KEY},
         json=datos,
         timeout=120
     )
 
     if respuesta.status_code != 200:
-        print("ERROR GEMINI:", respuesta.status_code)
-        print("RESPUESTA GEMINI:", respuesta.text)
         raise Exception(
-            f"Gemini respondió {respuesta.status_code}: {respuesta.text}"
+            f"Gemini respondió {respuesta.status_code}: "
+            f"{respuesta.text}"
         )
 
     resultado = respuesta.json()
