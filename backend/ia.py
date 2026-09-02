@@ -1,165 +1,124 @@
 import os
-import base64
-import httpx
+import tempfile
 import time
+
+from google import genai
 
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-GEMINI_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-3.6-flash:generateContent"
-)
-
 
 def transcribir_archivo(archivo):
-
     if not API_KEY:
         raise Exception("No se encontró GEMINI_API_KEY en Render.")
 
     inicio = time.time()
 
-    # -----------------------------------------
-    # PREPARAR AUDIO
-    # -----------------------------------------
-
-    audio_base64 = base64.b64encode(archivo).decode("utf-8")
-
     print("🎙️ Preparando audio...")
     print("📦 Tamaño del audio:", len(archivo), "bytes")
 
-    datos = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "text": (
-                            "Transcribe exactamente este audio en español. "
-                            "Devuelve solamente la transcripción, "
-                            "sin explicaciones ni comentarios."
-                        )
-                    },
-                    {
-                        "inline_data": {
-                            "mime_type": "audio/wav",
-                            "data": audio_base64
-                        }
-                    }
-                ]
-            }
-        ]
-    }
+    # Guardar temporalmente el audio recibido
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".wav"
+    ) as temporal:
 
-    # -----------------------------------------
-    # INTENTAR TRANSCRIPCIÓN
-    # -----------------------------------------
+        temporal.write(archivo)
+        ruta_audio = temporal.name
 
-    max_intentos = 3
+    try:
+        print("🚀 Conectando con Gemini 3.5 Transcribe...")
 
-    for intento in range(1, max_intentos + 1):
+        client = genai.Client(
+            api_key=API_KEY
+        )
+
+        # Subir audio mediante Files API
+        inicio_subida = time.time()
+
+        audio_file = client.files.upload(
+            file=ruta_audio
+        )
+
+        tiempo_subida = time.time() - inicio_subida
 
         print(
-            f"🚀 Enviando audio a Gemini "
-            f"(intento {intento}/{max_intentos})..."
+            f"📤 Audio subido en {tiempo_subida:.2f} segundos"
         )
+
+        print("🧠 Transcribiendo con Gemini 3.5 Transcribe...")
 
         inicio_gemini = time.time()
 
-        try:
-
-            respuesta = httpx.post(
-                GEMINI_URL,
-                params={"key": API_KEY},
-                json=datos,
-                timeout=120
-            )
-
-        except Exception as error:
-
-            print("❌ Error de conexión con Gemini:", error)
-
-            if intento < max_intentos:
-                espera = 2 ** intento
-                print(f"⏳ Reintentando en {espera} segundos...")
-                time.sleep(espera)
-                continue
-
-            raise Exception(
-                f"No se pudo conectar con Gemini: {error}"
-            )
+        interaction = client.interactions.create(
+            model="gemini-3.5-transcribe",
+            input=[
+                {
+                    "type": "audio",
+                    "uri": audio_file.uri,
+                    "mime_type": audio_file.mime_type,
+                }
+            ],
+            generation_config={
+                "transcription_config": {
+                    "mode": "smart",
+                    "custom_vocabulary": [
+                        "vid",
+                        "poda",
+                        "riego",
+                        "fertilización",
+                        "fertilizante",
+                        "fungicida",
+                        "insecticida",
+                        "cosecha",
+                        "cuartel",
+                        "parra",
+                        "frutal",
+                        "uva",
+                        "uva de mesa",
+                        "mandarina",
+                        "nogal",
+                        "durazno",
+                        "manzano",
+                        "productor",
+                        "agricultor",
+                        "labor agrícola"
+                    ]
+                }
+            }
+        )
 
         tiempo_gemini = time.time() - inicio_gemini
 
         print(
-            f"⏱️ Gemini respondió en "
-            f"{tiempo_gemini:.2f} segundos"
+            f"⏱️ Gemini tardó: {tiempo_gemini:.2f} segundos"
         )
 
-        # -----------------------------------------
-        # RESPUESTA CORRECTA
-        # -----------------------------------------
+        texto = interaction.output_text
 
-        if respuesta.status_code == 200:
-
-            resultado = respuesta.json()
-
-            try:
-
-                texto = (
-                    resultado["candidates"][0]
-                    ["content"]["parts"][0]["text"]
-                )
-
-            except (KeyError, IndexError):
-
-                raise Exception(
-                    f"Respuesta inesperada de Gemini: "
-                    f"{resultado}"
-                )
-
-            tiempo_total = time.time() - inicio
-
-            print(
-                f"✅ Transcripción completada en "
-                f"{tiempo_total:.2f} segundos"
+        if not texto:
+            raise Exception(
+                "Gemini no devolvió ninguna transcripción."
             )
 
-            return texto.strip()
+        tiempo_total = time.time() - inicio
 
-        # -----------------------------------------
-        # GEMINI NO DISPONIBLE TEMPORALMENTE
-        # -----------------------------------------
+        print(
+            f"✅ Transcripción completada en "
+            f"{tiempo_total:.2f} segundos"
+        )
 
-        if respuesta.status_code in (429, 500, 502, 503, 504):
+        print("📝 Transcripción:", texto)
 
-            print(
-                f"⚠️ Gemini respondió "
-                f"{respuesta.status_code}"
-            )
+        return texto.strip()
 
-            if intento < max_intentos:
-
-                espera = 2 ** intento
-
-                print(
-                    f"⏳ Gemini está temporalmente ocupado. "
-                    f"Reintentando en {espera} segundos..."
-                )
-
-                time.sleep(espera)
-                continue
-
-        # -----------------------------------------
-        # OTRO ERROR
-        # -----------------------------------------
-
+    except Exception as error:
+        print("❌ Error en Gemini Transcribe:", error)
         raise Exception(
-            f"Gemini respondió "
-            f"{respuesta.status_code}: "
-            f"{respuesta.text}"
+            f"Error al transcribir el audio: {error}"
         )
 
-    raise Exception(
-        "No fue posible obtener la transcripción "
-        "después de varios intentos."
-    )
+    finally:
+        # Eliminar archivo temporal del servidor
+        if os.path.exists(ruta_audio):
+            os.remove(ruta_audio)

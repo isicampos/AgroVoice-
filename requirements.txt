@@ -6,5 +6,6 @@ reportlab
 openai-whisper
 python-multipart
 httpx
+google-genai==2.21.0
 
 
