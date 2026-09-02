@@ -8,8 +8,9 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.5-flash:generateContent"
+    "gemini-3.6-flash:generateContent"
 )
+
 
 def transcribir_archivo(archivo):
 
@@ -18,10 +19,14 @@ def transcribir_archivo(archivo):
 
     inicio = time.time()
 
+    # -----------------------------------------
+    # PREPARAR AUDIO
+    # -----------------------------------------
+
     audio_base64 = base64.b64encode(archivo).decode("utf-8")
 
     print("🎙️ Preparando audio...")
-    print("📦 Tamaño original:", len(archivo), "bytes")
+    print("📦 Tamaño del audio:", len(archivo), "bytes")
 
     datos = {
         "contents": [
@@ -45,37 +50,116 @@ def transcribir_archivo(archivo):
         ]
     }
 
-    print("🚀 Enviando audio a Gemini...")
+    # -----------------------------------------
+    # INTENTAR TRANSCRIPCIÓN
+    # -----------------------------------------
 
-    inicio_gemini = time.time()
+    max_intentos = 3
 
-    respuesta = httpx.post(
-        GEMINI_URL,
-        params={"key": API_KEY},
-        json=datos,
-        timeout=120
-    )
+    for intento in range(1, max_intentos + 1):
 
-    tiempo_gemini = time.time() - inicio_gemini
+        print(
+            f"🚀 Enviando audio a Gemini "
+            f"(intento {intento}/{max_intentos})..."
+        )
 
-    print(f"⏱️ Gemini tardó: {tiempo_gemini:.2f} segundos")
+        inicio_gemini = time.time()
 
-    if respuesta.status_code != 200:
+        try:
+
+            respuesta = httpx.post(
+                GEMINI_URL,
+                params={"key": API_KEY},
+                json=datos,
+                timeout=120
+            )
+
+        except Exception as error:
+
+            print("❌ Error de conexión con Gemini:", error)
+
+            if intento < max_intentos:
+                espera = 2 ** intento
+                print(f"⏳ Reintentando en {espera} segundos...")
+                time.sleep(espera)
+                continue
+
+            raise Exception(
+                f"No se pudo conectar con Gemini: {error}"
+            )
+
+        tiempo_gemini = time.time() - inicio_gemini
+
+        print(
+            f"⏱️ Gemini respondió en "
+            f"{tiempo_gemini:.2f} segundos"
+        )
+
+        # -----------------------------------------
+        # RESPUESTA CORRECTA
+        # -----------------------------------------
+
+        if respuesta.status_code == 200:
+
+            resultado = respuesta.json()
+
+            try:
+
+                texto = (
+                    resultado["candidates"][0]
+                    ["content"]["parts"][0]["text"]
+                )
+
+            except (KeyError, IndexError):
+
+                raise Exception(
+                    f"Respuesta inesperada de Gemini: "
+                    f"{resultado}"
+                )
+
+            tiempo_total = time.time() - inicio
+
+            print(
+                f"✅ Transcripción completada en "
+                f"{tiempo_total:.2f} segundos"
+            )
+
+            return texto.strip()
+
+        # -----------------------------------------
+        # GEMINI NO DISPONIBLE TEMPORALMENTE
+        # -----------------------------------------
+
+        if respuesta.status_code in (429, 500, 502, 503, 504):
+
+            print(
+                f"⚠️ Gemini respondió "
+                f"{respuesta.status_code}"
+            )
+
+            if intento < max_intentos:
+
+                espera = 2 ** intento
+
+                print(
+                    f"⏳ Gemini está temporalmente ocupado. "
+                    f"Reintentando en {espera} segundos..."
+                )
+
+                time.sleep(espera)
+                continue
+
+        # -----------------------------------------
+        # OTRO ERROR
+        # -----------------------------------------
+
         raise Exception(
-            f"Gemini respondió {respuesta.status_code}: "
+            f"Gemini respondió "
+            f"{respuesta.status_code}: "
             f"{respuesta.text}"
         )
 
-    resultado = respuesta.json()
-
-    texto = (
-        resultado["candidates"][0]
-        ["content"]["parts"][0]
-        ["text"]
+    raise Exception(
+        "No fue posible obtener la transcripción "
+        "después de varios intentos."
     )
-
-    tiempo_total = time.time() - inicio
-
-    print(f"✅ Tiempo total de transcripción: {tiempo_total:.2f} segundos")
-
-    return texto.strip()
